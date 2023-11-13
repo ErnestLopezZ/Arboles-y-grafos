@@ -138,24 +138,12 @@ int encontrarMaximo(TNodo* raiz) {
 // Función para calcular la suma de los valores en el árbol
 
 int calcularSuma(TNodo* raiz) {
-    // Verificar si la raíz es NULL (árbol vacío)
     if (raiz == NULL) {
-        // Devolver 0 si la raíz es NULL
         return 0;
     }
-
-    // Calcular la suma:
-    // 1. Sumar el valor de la raíz
     int sumaRaiz = raiz->info;
-
-    // 2. Sumar recursivamente el valor de los nodos en el subárbol izquierdo
     int sumaIzquierda = calcularSuma(raiz->izq);
-
-    // 3. Sumar recursivamente el valor de los nodos en el subárbol derecho
     int sumaDerecha = calcularSuma(raiz->der);
-
-    // Retorno de la Suma Total:
-    // Sumar la raíz, la suma del subárbol izquierdo y la suma del subárbol derecho
     return sumaRaiz + sumaIzquierda + sumaDerecha;
 }
 
