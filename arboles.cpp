@@ -3,6 +3,7 @@ using namespace std;
 
 struct TNodo {
    int info;
+   string informacion;
    TNodo *izq, *der;
 };
 
@@ -12,25 +13,67 @@ TNodo* crea(int dato) {
     nuevo->izq = nuevo->der = NULL;
     return nuevo;
 }
+TNodo* crea(string dato) {
+    TNodo* nuevo = new TNodo;
+    nuevo->informacion = dato;
+    nuevo->izq = nuevo->der = NULL;
+    return nuevo;
+}
 
-TNodo* CreaArbol() {
+TNodo* CreaArbol(bool FamiliaCarlos) {
+    TNodo* raiz;
     int dato;
+    string nombre;
     cout << "Dato para el arbol (0 para terminar): ";
-    cin >> dato;
-    if (dato == 0) {
+    if(FamiliaCarlos ==false){
+        cin >> dato;
+    }
+    else{
+        fflush(stdin);
+         getline(cin, nombre);
+         fflush(stdin);
+    }
+    if (dato == 0 || nombre == "0") {
         return NULL;
     }
-    TNodo* raiz = crea(dato);
-    cout << "Existe Nodo por la IZQUIERDA 1=si: ";
+    if(FamiliaCarlos == false){
+         raiz = crea(dato);
+    }
+    else{
+         raiz = crea(nombre);
+    }
+    
+    if(FamiliaCarlos== false){
+        cout << "Existe Nodo por la IZQUIERDA 1=si: ";
+    }
+    else{
+        cout << "Continua familia de parte de la Madre 1=si";
+    }
     int resp;
     cin >> resp;
     if (resp == 1) {
-        raiz->izq = CreaArbol();
+        if(FamiliaCarlos == false){
+            raiz->izq = CreaArbol(false);
+        }
+        else{
+            raiz->izq = CreaArbol(true);
+        }
+        
     }
-    cout << "Existe Nodo por la DERECHA 1=si: ";
+    if(FamiliaCarlos == false){
+         cout << "Existe Nodo por la DERECHA 1=si: ";
+    }
+    else{
+        cout << "Continua Familia por parte del Padre 1=si: ";
+    }
     cin >> resp;
     if (resp == 1) {
-        raiz->der = CreaArbol();
+        if(FamiliaCarlos == false){
+             raiz->der = CreaArbol(false);
+        }
+        else{
+             raiz->der = CreaArbol(true);
+        }
     }
     return raiz;
 }
@@ -46,11 +89,23 @@ void prefijo(TNodo* raiz) {
 
 }
 
-void infijo(TNodo* raiz) {
+void infijo(TNodo* raiz, bool FamiliaCarlos) {
     if (raiz != NULL) {
-        infijo(raiz->izq);
-        cout << raiz->info << "-";
-        infijo(raiz->der);
+        if(FamiliaCarlos == false){
+             infijo(raiz->izq, false);
+             cout << raiz->info << "-";
+        }
+        else{
+              infijo(raiz->izq, true);
+              cout << raiz->informacion << "-";
+        }
+        if(FamiliaCarlos == false){
+            infijo(raiz->der, false);
+        }
+        else{
+            infijo(raiz->der, true);
+        }
+       
     }
 }
 
@@ -191,19 +246,23 @@ int main() {
         cout << endl << "5...Buscar dato dentro del arbol";
         cout << endl << "6...Contar nodos del arbol binario";
         cout << endl << "7...Contar nodos internos del arbol";
+        cout << endl << "8...Maximo valor del arbol y promedio";
+        cout << endl << "9...Imprimir informacion de las hojas";
+        cout << endl << "10..Imprimir informacion de los Internos";
+        cout << endl << "11..Agregar familia de carlos";
         cout << endl << "0...Salir";
         cout << endl << "Selecciona tu opcion: ";
         cin >> op;
         switch (op) {
             case 1:
-                raiz = CreaArbol();
+                raiz = CreaArbol(false);
                 break;
             case 2:
                 prefijo(raiz);
                 cout << endl;
                 break;
             case 3:
-                infijo(raiz);
+                infijo(raiz,false);
                 cout << endl;
                 break;
             case 4:
@@ -242,6 +301,11 @@ int main() {
                 cout << "Información de los nodos internos:" << endl;
                 imprimirNodosInternos(raiz);
                 break;
+            case 11: 
+                cout << "Agregando la familia de carlos: " << endl;
+                raiz = CreaArbol(true);
+                infijo(raiz,true);
+                
             case 0:
                 cout << endl << "Hasta luego!!" << endl;
                 break;
