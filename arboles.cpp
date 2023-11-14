@@ -154,6 +154,32 @@ int calcularSuma(TNodo* raiz) {
 
     return raiz->info + calcularSuma(raiz->izq) + calcularSuma(raiz->der);
 }*/
+
+void imprimirHojas(TNodo* raiz, bool esRaizPrincipal = true) {
+    if (raiz != NULL) {
+        if (raiz->izq == NULL && raiz->der == NULL && !esRaizPrincipal) {
+            cout << "Hoja: " << raiz->info << endl;
+        } else {
+            imprimirHojas(raiz->izq, false);
+            imprimirHojas(raiz->der, false);
+        }
+    }
+}
+
+
+void imprimirNodosInternos(TNodo* raiz, bool esRaizPrincipal = true) {
+    if (raiz != NULL) {
+        if (raiz->izq != NULL || raiz->der != NULL) {
+            if (!esRaizPrincipal) {
+                cout << "Nodo interno: " << raiz->info << endl;
+            }
+        }
+
+        imprimirNodosInternos(raiz->izq, false);
+        imprimirNodosInternos(raiz->der, false);
+    }
+}
+
 int main() {
     TNodo* raiz = NULL;
     int op,dato;
@@ -207,6 +233,14 @@ int main() {
                 } else {
                     cout << "El árbol está vacío." << endl;
                 }
+                break;
+            case 9:
+                cout << "Información de las hojas:" << endl;
+                imprimirHojas(raiz);
+                break;
+            case 10:
+                cout << "Información de los nodos internos:" << endl;
+                imprimirNodosInternos(raiz);
                 break;
             case 0:
                 cout << endl << "Hasta luego!!" << endl;
