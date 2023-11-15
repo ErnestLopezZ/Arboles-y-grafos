@@ -3,9 +3,121 @@ using namespace std;
 
 struct TNodo {
    int info;
+   int FE;
    string informacion;
    TNodo *izq, *der;
 };
+
+void menuAVL();
+TNodo* crea(int dato);
+TNodo* crea(string dato);
+TNodo* CreaArbol(bool FamiliaCarlos);
+void prefijo(TNodo* raiz);
+void infijo(TNodo* raiz, bool FamiliaCarlos);
+void posfijo(TNodo* raiz);
+void buscar(TNodo *raiz,int dato);
+int contarNodos(TNodo* raiz);
+int contarNodosInternos(TNodo* raiz);
+int encontrarMaximo(TNodo* raiz);
+int calcularSuma(TNodo* raiz);
+void imprimirHojas(TNodo* raiz, bool esRaizPrincipal = true);
+void imprimirNodosInternos(TNodo* raiz, bool esRaizPrincipal = true);
+void Inserta_balanceado(TNodo* &NODO, bool &BO, int INFOR);
+void Reestructura_izq(TNodo* &NODO, bool &BO);
+void Reestructura_der(TNodo* &NODO, bool &BO);
+void Elimina_balanceado(TNodo* &NODO, bool &BO, int INFOR);
+
+
+
+
+
+
+
+int main() {
+    TNodo* raiz = NULL;
+    int op,dato;
+    do {
+        cout << endl << "1...Cargar el arbol a memoria";
+        cout << endl << "2...Recorrido prefijo";
+        cout << endl << "3...Recorrido infijo";
+        cout << endl << "4...Recorrido posfijo";
+        cout << endl << "5...Buscar dato dentro del arbol";
+        cout << endl << "6...Contar nodos del arbol binario";
+        cout << endl << "7...Contar nodos internos del arbol";
+        cout << endl << "8...Maximo valor del arbol y promedio";
+        cout << endl << "9...Imprimir informacion de las hojas";
+        cout << endl << "10..Imprimir informacion de los Internos";
+        cout << endl << "11..Agregar familia de carlos";
+        cout << endl << "0...Salir";
+        cout << endl << "Selecciona tu opcion: ";
+        cin >> op;
+        switch (op) {
+            case 1:
+                raiz = CreaArbol(false);
+                break;
+            case 2:
+                prefijo(raiz);
+                cout << endl;
+                break;
+            case 3:
+                infijo(raiz,false);
+                cout << endl;
+                break;
+            case 4:
+                posfijo(raiz);
+                cout << endl;
+                break;
+            case 5:
+                cout << "Dame el dato que deseas buscar dentro del arbol: " << endl;
+                cin >> dato;
+                buscar(raiz,dato);
+                break;
+            case 6: 
+                cout << "El arbol tiene " << contarNodos(raiz) << " nodos." << endl;
+                break;
+            case 7: 
+                cout << "El arbol tiene " << contarNodosInternos(raiz) << " nodos internos." << endl;
+                break;
+            case 8: 
+                if (raiz != NULL) {
+                    int maximo = encontrarMaximo(raiz);
+                    int suma = calcularSuma(raiz);
+                    int cantidadNodos = contarNodos(raiz);
+                    double promedio = cantidadNodos == 0 ? 0 : suma / (1.0 * cantidadNodos);
+
+                    cout << "Máximo valor en el árbol: " << maximo << endl;
+                    cout << "Promedio de los valores en el árbol: " << promedio << endl;
+                } else {
+                    cout << "El árbol está vacío." << endl;
+                }
+                break;
+            case 9:
+                cout << "Información de las hojas:" << endl;
+                imprimirHojas(raiz, true);
+                break;
+            case 10:
+                cout << "Información de los nodos internos:" << endl;
+                imprimirNodosInternos(raiz, true);
+                break;
+            case 11: 
+                cout << "Agregando la familia de carlos: " << endl;
+                raiz = CreaArbol(true);
+                infijo(raiz,true);
+            case 12: 
+                menuAVL();
+                break;
+                
+            case 0:
+                cout << endl << "Hasta luego!!" << endl;
+                break;
+        }
+    } while (op != 0);
+
+    // Limpieza de memoria: se debe liberar la memoria utilizada por el árbol.
+    // Puedes agregar la lógica para hacerlo aquí.
+    
+    return 0;
+}
 
 TNodo* crea(int dato) {
     TNodo* nuevo = new TNodo;
@@ -210,7 +322,7 @@ int calcularSuma(TNodo* raiz) {
     return raiz->info + calcularSuma(raiz->izq) + calcularSuma(raiz->der);
 }*/
 
-void imprimirHojas(TNodo* raiz, bool esRaizPrincipal = true) {
+void imprimirHojas(TNodo* raiz, bool esRaizPrincipal) {
     if (raiz != NULL) {
         if (raiz->izq == NULL && raiz->der == NULL && !esRaizPrincipal) {
             cout << "Hoja: " << raiz->info << endl;
@@ -222,7 +334,7 @@ void imprimirHojas(TNodo* raiz, bool esRaizPrincipal = true) {
 }
 
 
-void imprimirNodosInternos(TNodo* raiz, bool esRaizPrincipal = true) {
+void imprimirNodosInternos(TNodo* raiz, bool esRaizPrincipal) {
     if (raiz != NULL) {
         if (raiz->izq != NULL || raiz->der != NULL) {
             if (!esRaizPrincipal) {
@@ -235,85 +347,292 @@ void imprimirNodosInternos(TNodo* raiz, bool esRaizPrincipal = true) {
     }
 }
 
-int main() {
-    TNodo* raiz = NULL;
-    int op,dato;
-    do {
-        cout << endl << "1...Cargar el arbol a memoria";
-        cout << endl << "2...Recorrido prefijo";
-        cout << endl << "3...Recorrido infijo";
-        cout << endl << "4...Recorrido posfijo";
-        cout << endl << "5...Buscar dato dentro del arbol";
-        cout << endl << "6...Contar nodos del arbol binario";
-        cout << endl << "7...Contar nodos internos del arbol";
-        cout << endl << "8...Maximo valor del arbol y promedio";
-        cout << endl << "9...Imprimir informacion de las hojas";
-        cout << endl << "10..Imprimir informacion de los Internos";
-        cout << endl << "11..Agregar familia de carlos";
-        cout << endl << "0...Salir";
-        cout << endl << "Selecciona tu opcion: ";
-        cin >> op;
-        switch (op) {
-            case 1:
-                raiz = CreaArbol(false);
-                break;
-            case 2:
-                prefijo(raiz);
-                cout << endl;
-                break;
-            case 3:
-                infijo(raiz,false);
-                cout << endl;
-                break;
-            case 4:
-                posfijo(raiz);
-                cout << endl;
-                break;
-            case 5:
-                cout << "Dame el dato que deseas buscar dentro del arbol: " << endl;
-                cin >> dato;
-                buscar(raiz,dato);
-                break;
-            case 6: 
-                cout << "El arbol tiene " << contarNodos(raiz) << " nodos." << endl;
-                break;
-            case 7: 
-                cout << "El arbol tiene " << contarNodosInternos(raiz) << " nodos internos." << endl;
-                break;
-            case 8: 
-                if (raiz != NULL) {
-                    int maximo = encontrarMaximo(raiz);
-                    int suma = calcularSuma(raiz);
-                    int cantidadNodos = contarNodos(raiz);
-                    double promedio = cantidadNodos == 0 ? 0 : suma / (1.0 * cantidadNodos);
+void Inserta_balanceado(TNodo* &NODO, bool &BO, int INFOR) {
+    TNodo *OTRO, *NODO1, *NODO2;
+    
+    if (NODO == NULL) {
+        NODO = new TNodo;
+        NODO->info = INFOR;
+        NODO->FE = 0;
+        NODO->izq = NODO->der = NULL;
+        BO = true;
+    } else {
+        if (INFOR < NODO->info) {
+            Inserta_balanceado(NODO->izq, BO, INFOR);
+            
+            if (BO == true) {
+                switch (NODO->FE) {
+                    case 1:
+                        NODO->FE = 0;
+                        BO = false;
+                        break;
+                    case 0:
+                        NODO->FE = -1;
+                        break;
+                    case -1:
+                        NODO1 = NODO->izq;
+                        if (NODO1->FE == -1) {
+                            NODO->izq = NODO1->der;
+                            NODO1->der = NODO;
+                            NODO->FE = 0;
+                            NODO = NODO1;
+                        } else {
+                            NODO2 = NODO1->der;
+                            NODO1->der = NODO2->izq;
+                            NODO2->izq = NODO1;
+                            NODO->izq = NODO2->der;
+                            NODO2->der = NODO;
+                            if (NODO2->FE == -1) {
+                                NODO->FE = 1;
+                            } else {
+                                NODO->FE = 0;
+                            }
+                            if (NODO2->FE == 1) {
+                                NODO1->FE = -1;
+                            } else {
+                                NODO1->FE = 0;
+                            }
+                            NODO = NODO2;
+                        }
+                        NODO->FE = 0;
+                        BO = false;
+                        break;
+                }
+            }
+        } else if (INFOR > NODO->info) {
+            Inserta_balanceado(NODO->der, BO, INFOR);
+            
+            if (BO == true) {
+                switch (NODO->FE) {
+                    case -1:
+                        NODO->FE = 0;
+                        BO = false;
+                        break;
+                    case 0:
+                        NODO->FE = 1;
+                        break;
+                    case 1:
+                        NODO1 = NODO->der;
+                        if (NODO1->FE == 1) {
+                            NODO->der = NODO1->izq;
+                            NODO1->izq = NODO;
+                            NODO->FE = 0;
+                            NODO = NODO1;
+                        } else {
+                            NODO2 = NODO1->izq;
+                            NODO1->izq = NODO2->der;
+                            NODO2->der = NODO1;
+                            NODO->der = NODO2->izq;
+                            NODO2->izq = NODO;
+                            if (NODO2->FE == 1) {
+                                NODO->FE = -1;
+                            } else {
+                                NODO->FE = 0;
+                            }
+                            if (NODO2->FE == -1) {
+                                NODO1->FE = 1;
+                            } else {
+                                NODO1->FE = 0;
+                            }
+                            NODO = NODO2;
+                        }
+                        NODO->FE = 0;
+                        BO = false;
+                        break;
+                }
+            }
+        } else {
+            cout << "La información ya se encuentra en el árbol" << endl;
+            BO = false;
+        }
+    }
+}
 
-                    cout << "Máximo valor en el árbol: " << maximo << endl;
-                    cout << "Promedio de los valores en el árbol: " << promedio << endl;
-                } else {
-                    cout << "El árbol está vacío." << endl;
+void Reestructura_izq(TNodo* &NODO, bool &BO) {
+    TNodo *NODO1, *NODO2;
+    
+    if (BO == true) {
+        switch (NODO->FE) {
+            case -1:
+                NODO->FE = 0;
+                break;
+            case 0:
+                NODO->FE = 1;
+                BO = false;
+                break;
+            case 1: // Reestructuración del árbol
+                NODO1 = NODO->der;
+                if (NODO1->FE == 0) { // Rotación DD
+                    NODO->der = NODO1->izq;
+                    NODO1->izq = NODO;
+                    NODO->FE = 1;
+                    NODO1->FE = -1;
+                    BO = false;
+                } else if (NODO1->FE == 1) {
+                    NODO->FE = 0;
+                    NODO1->FE = 0;
+                    BO = false;
+                } else { // Rotación DI
+                    NODO2 = NODO1->izq;
+                    NODO->der = NODO2->izq;
+                    NODO2->izq = NODO;
+                    NODO1->izq = NODO2->der;
+                    NODO2->der = NODO1;
+                    if (NODO2->FE == 1) {
+                        NODO->FE = -1;
+                    } else {
+                        NODO->FE = 0;
+                    }
+                    if (NODO2->FE == -1) {
+                        NODO1->FE = 1;
+                    } else {
+                        NODO1->FE = 0;
+                    }
+                    NODO = NODO2;
+                    NODO->FE = 0;
+                    BO = false;
                 }
                 break;
-            case 9:
-                cout << "Información de las hojas:" << endl;
-                imprimirHojas(raiz);
+        }
+    }
+}
+
+void Reestructura_der(TNodo* &NODO, bool &BO) {
+    TNodo *NODO1, *NODO2;
+
+    if (BO == true) {
+        switch (NODO->FE) {
+            case 1:
+                NODO->FE = 0;
                 break;
-            case 10:
-                cout << "Información de los nodos internos:" << endl;
-                imprimirNodosInternos(raiz);
-                break;
-            case 11: 
-                cout << "Agregando la familia de carlos: " << endl;
-                raiz = CreaArbol(true);
-                infijo(raiz,true);
-                
             case 0:
-                cout << endl << "Hasta luego!!" << endl;
+                NODO->FE = -1;
+                BO = false;
+                break;
+            case -1: // Reestructuración del árbol
+                NODO1 = NODO->izq;
+                if (NODO1->FE == 0) { // Rotación II
+                    NODO->izq = NODO1->der;
+                    NODO1->der = NODO;
+                    NODO->FE = -1;
+                    NODO1->FE = 1;
+                    BO = false;
+                } else if (NODO1->FE == -1) {
+                    NODO->FE = 0;
+                    NODO1->FE = 0;
+                    BO = false;
+                } else { // Rotación ID
+                    NODO2 = NODO1->der;
+                    NODO->izq = NODO2->der;
+                    NODO2->der = NODO;
+                    NODO1->der = NODO2->izq;
+                    NODO2->izq = NODO1;
+                    if (NODO2->FE == -1) {
+                        NODO->FE = 1;
+                    } else {
+                        NODO->FE = 0;
+                    }
+                    if (NODO2->FE == 1) {
+                        NODO1->FE = -1;
+                    } else {
+                        NODO1->FE = 0;
+                    }
+                    NODO = NODO2;
+                    NODO->FE = 0;
+                    BO = false;
+                }
+                break;
+        }
+    }
+}
+void Elimina_balanceado(TNodo* &NODO, bool &BO, int INFOR) {
+    TNodo *OTRO, *AUX, *AUX1;
+    bool BOOL = false;
+
+    if (NODO != NULL) {
+        if (INFOR < NODO->info) {
+            Elimina_balanceado(NODO->izq, BO, INFOR);
+            Reestructura_izq(NODO, BO);
+        } else if (INFOR > NODO->info) {
+            Elimina_balanceado(NODO->der, BO, INFOR);
+            Reestructura_der(NODO, BO);
+        } else {
+            OTRO = NODO;
+            BO = true;
+
+            if (OTRO->der == NULL) {
+                NODO = OTRO->izq;
+            } else if (OTRO->izq == NULL) {
+                NODO = OTRO->der;
+            } else {
+                AUX = OTRO->izq;
+                BOOL = false;
+
+                while (AUX->der != NULL) {
+                    AUX1 = AUX;
+                    AUX = AUX->der;
+                    BOOL = true;
+                }
+
+                NODO->info = AUX->info;
+                OTRO = AUX;
+
+                if (BOOL == true) {
+                    AUX1->der = AUX->izq;
+                } else {
+                    NODO->izq = AUX->izq;
+                }
+                Reestructura_der(NODO->izq, BO);
+            }
+            delete OTRO;
+        }
+    } else {
+        cout << "La información no se encuentra en el árbol" << endl;
+    }
+}
+
+
+
+
+
+void menuAVL(){
+    TNodo* raiz = NULL;
+    bool altura_crecida = false;
+    bool altura_disminuida = false;
+    int op, dato;
+
+    do {
+        cout << endl << "1...Insertar elemento en el árbol balanceado";
+        cout << endl << "2...Eliminar elemento en el árbol balanceado";
+        cout << endl << "3...Imprimir arbol AVL";
+        cout << endl << "Selecciona tu opción: ";
+        cin >> op;
+
+        switch (op) {
+            case 1:
+                cout << "Ingresa el dato a insertar: ";
+                cin >> dato;
+                Inserta_balanceado(raiz, altura_crecida, dato);
+                break;
+            case 2:
+                cout << "Ingresa el dato a eliminar: ";
+                cin >> dato;
+                Elimina_balanceado(raiz, altura_disminuida, dato);
+                break;
+            case 3:
+                cout << "Imprimir arbol en infijo" << endl;
+                infijo(raiz,false);
+                break;
+            case 4:
+                cout << "Saliendo del programa..." << endl;
+                main();
+                break;
+            default:
+                cout << "Opción no válida. Inténtalo de nuevo." << endl;
                 break;
         }
     } while (op != 0);
 
-    // Limpieza de memoria: se debe liberar la memoria utilizada por el árbol.
-    // Puedes agregar la lógica para hacerlo aquí.
-    
-    return 0;
 }
+
+
