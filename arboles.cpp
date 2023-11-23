@@ -1,6 +1,11 @@
 #include <iostream>
-using namespace std;
+#include <limits>
+#include <climits> 
+#include <string>
+#include <algorithm>
 
+using namespace std;
+#define INF INT_MAX
 struct TNodo {
    int info;
    int FE;
@@ -26,12 +31,17 @@ void Inserta_balanceado(TNodo* &NODO, bool &BO, int INFOR);
 void Reestructura_izq(TNodo* &NODO, bool &BO);
 void Reestructura_der(TNodo* &NODO, bool &BO);
 void Elimina_balanceado(TNodo* &NODO, bool &BO, int INFOR);
+//grafos
+void grafos();
+void imprimirMatriz(int** matriz, int n);
+void dijkstra(int** grafo, int n, int inicio);
+void floyd(int** grafo, int n);
+void warshall(int** grafo, int n);
+void liberarArbol(TNodo* nodo);
 
 
 
-
-
-
+//Luis Ernesto Lopez Cardenas ISC 3A
 
 int main() {
     TNodo* raiz = NULL;
@@ -48,6 +58,8 @@ int main() {
         cout << endl << "9...Imprimir informacion de las hojas";
         cout << endl << "10..Imprimir informacion de los Internos";
         cout << endl << "11..Agregar familia de carlos";
+        cout << endl << "12. Arboles AVL";
+        cout << endl << "13. Grafos";
         cout << endl << "0...Salir";
         cout << endl << "Selecciona tu opcion: ";
         cin >> op;
@@ -85,18 +97,18 @@ int main() {
                     int cantidadNodos = contarNodos(raiz);
                     double promedio = cantidadNodos == 0 ? 0 : suma / (1.0 * cantidadNodos);
 
-                    cout << "Máximo valor en el árbol: " << maximo << endl;
-                    cout << "Promedio de los valores en el árbol: " << promedio << endl;
+                    cout << "Maximo valor en el arbol: " << maximo << endl;
+                    cout << "Promedio de los valores en el arbol: " << promedio << endl;
                 } else {
-                    cout << "El árbol está vacío." << endl;
+                    cout << "El arbol esta vacio." << endl;
                 }
                 break;
             case 9:
-                cout << "Información de las hojas:" << endl;
+                cout << "Informacion de las hojas:" << endl;
                 imprimirHojas(raiz, true);
                 break;
             case 10:
-                cout << "Información de los nodos internos:" << endl;
+                cout << "Informacion de los nodos internos:" << endl;
                 imprimirNodosInternos(raiz, true);
                 break;
             case 11: 
@@ -106,6 +118,9 @@ int main() {
             case 12: 
                 menuAVL();
                 break;
+            case 13:
+                grafos();
+                break;
                 
             case 0:
                 cout << endl << "Hasta luego!!" << endl;
@@ -113,10 +128,20 @@ int main() {
         }
     } while (op != 0);
 
-    // Limpieza de memoria: se debe liberar la memoria utilizada por el árbol.
-    // Puedes agregar la lógica para hacerlo aquí.
+    liberarArbol(raiz);
+   
     
     return 0;
+}
+
+void liberarArbol(TNodo* nodo) {
+    if (nodo == NULL) {
+        return;
+    }
+
+    liberarArbol(nodo->izq);
+    liberarArbol(nodo->der);
+    delete nodo;
 }
 
 TNodo* crea(int dato) {
@@ -281,8 +306,7 @@ int contarNodosInternos(TNodo* raiz) {
 
 int encontrarMaximo(TNodo* raiz) {
     if (raiz == NULL) {
-        // Si el árbol está vacío, puedes devolver un valor que indique que no hay máximo
-        // En este caso, devolvemos un valor que no debería ser alcanzado por los valores reales del árbol
+        
         return -1; 
     }
 
@@ -442,7 +466,7 @@ void Inserta_balanceado(TNodo* &NODO, bool &BO, int INFOR) {
                 }
             }
         } else {
-            cout << "La información ya se encuentra en el árbol" << endl;
+            cout << "La informacion ya se encuentra en el arbol" << endl;
             BO = false;
         }
     }
@@ -587,7 +611,7 @@ void Elimina_balanceado(TNodo* &NODO, bool &BO, int INFOR) {
             delete OTRO;
         }
     } else {
-        cout << "La información no se encuentra en el árbol" << endl;
+        cout << "La informacion no se encuentra en el arbol" << endl;
     }
 }
 
@@ -602,10 +626,11 @@ void menuAVL(){
     int op, dato;
 
     do {
-        cout << endl << "1...Insertar elemento en el árbol balanceado";
-        cout << endl << "2...Eliminar elemento en el árbol balanceado";
+        cout << endl << "1...Insertar elemento en el arbol balanceado";
+        cout << endl << "2...Eliminar elemento en el arbol balanceado";
         cout << endl << "3...Imprimir arbol AVL";
-        cout << endl << "Selecciona tu opción: ";
+        cout << endl << "0...Salir...";
+        cout << endl << "Selecciona tu opcion: ";
         cin >> op;
 
         switch (op) {
@@ -627,12 +652,183 @@ void menuAVL(){
                 cout << "Saliendo del programa..." << endl;
                 main();
                 break;
-            default:
-                cout << "Opción no válida. Inténtalo de nuevo." << endl;
+            case 0:
+                cout << "Adios" << endl;
                 break;
         }
     } while (op != 0);
+    liberarArbol(raiz);
 
 }
 
 
+void grafos() {
+    int n;
+    cout << "Ingrese la cantidad de nodos en el grafo: ";
+    cin >> n;
+
+    int** grafo = new int*[n];
+    for (int i = 0; i < n; ++i) {
+        grafo[i] = new int[n];
+    }
+
+    cout << "Ingrese la matriz de adyacencia para el grafo (coloque INF para representar infinito): " << endl;
+    string valor;
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            cin >> valor;
+
+            transform(valor.begin(), valor.end(), valor.begin(), ::tolower); // Convertir a minúsculas
+
+            if (valor == "inf") {
+                grafo[i][j] = INF;
+            } else {
+                try {
+                    grafo[i][j] = stoi(valor);
+                } catch (invalid_argument const& e) {
+                    cout << "Entrada invalida. Intente de nuevo." << endl;
+                    j--;  // Retrocede un paso para volver a ingresar el valor
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    continue;
+                }
+            }
+        }
+    }
+
+
+    int opcion;
+    do {
+        cout << "\nSeleccione una opcion:" << endl
+             << "1. Algoritmo de Dijkstra" << endl
+             << "2. Algoritmo de Floyd" << endl
+             << "3. Algoritmo de Warshall" << endl
+             << "0. Salir" << endl;
+
+        if (!(cin >> opcion)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Entrada invalida. Intente de nuevo." << endl;
+            continue;
+        }
+
+        switch (opcion) {
+            case 1:
+                int nodoInicio;
+                cout << "Ingrese el nodo de inicio para el algoritmo de Dijkstra (0 a " << n - 1 << "): ";
+                if (!(cin >> nodoInicio)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Entrada invalida. Intente de nuevo." << endl;
+                    break;
+                }
+                dijkstra(grafo, n, nodoInicio);
+                break;
+            case 2:
+                floyd(grafo, n);
+                break;
+            case 3:
+                warshall(grafo, n);
+                break;
+            case 0:
+                cout << "Saliendo del programa." << endl;
+                break;
+            default:
+                cout << "Opcion invalida. Intente de nuevo." << endl;
+                break;
+        }
+
+        if (opcion < 0 || opcion > 3) {
+            cout << "Opcion invalida. Intente de nuevo." << endl;
+        }
+    } while (opcion != 0);
+
+    // Liberar memoria
+    for (int i = 0; i < n; ++i) {
+        delete[] grafo[i];
+    }
+    delete[] grafo;
+}
+
+void imprimirMatriz(int** matriz, int n) {
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if (matriz[i][j] == INF) {
+                cout << "INF\t";
+            } else {
+                cout << matriz[i][j] << "\t";
+            }
+        }
+        cout << endl;
+    }
+}
+
+void dijkstra(int** grafo, int n, int inicio) {
+    int* distancias = new int[n];
+    bool* visitado = new bool[n];
+
+    for (int i = 0; i < n; ++i) {
+        distancias[i] = INF;
+        visitado[i] = false;
+    }
+
+    distancias[inicio] = 0;
+
+    for (int contador = 0; contador < n - 1; ++contador) {
+        int distanciaMin = INF, indiceMin;
+
+        for (int v = 0; v < n; ++v) {
+            if (!visitado[v] && distancias[v] <= distanciaMin) {
+                distanciaMin = distancias[v];
+                indiceMin = v;
+            }
+        }
+
+        int u = indiceMin;
+        visitado[u] = true;
+
+        for (int v = 0; v < n; ++v) {
+            if (!visitado[v] && grafo[u][v] && distancias[u] != INF && distancias[u] + grafo[u][v] < distancias[v]) {
+                distancias[v] = distancias[u] + grafo[u][v];
+            }
+        }
+    }
+
+    cout << "Distancias mas cortas desde el nodo " << inicio << " usando el algoritmo de Dijkstra: " << endl;
+    for (int i = 0; i < n; ++i) {
+        cout << "Nodo " << i << ": " << distancias[i] << endl;
+    }
+
+    delete[] distancias;
+    delete[] visitado;
+}
+
+void floyd(int** grafo, int n) {
+    for (int k = 0; k < n; ++k) {
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (grafo[i][k] != INF && grafo[k][j] != INF && grafo[i][k] + grafo[k][j] < grafo[i][j]) {
+                    grafo[i][j] = grafo[i][k] + grafo[k][j];
+                }
+            }
+        }
+    }
+
+    cout << "Distancias mas cortas usando el algoritmo de Floyd: " << endl;
+    imprimirMatriz(grafo, n);
+}
+
+void warshall(int** grafo, int n) {
+    for (int k = 0; k < n; ++k) {
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (grafo[i][k] != INF && grafo[k][j] != INF && (grafo[i][k] + grafo[k][j] < grafo[i][j])) {
+                    grafo[i][j] = grafo[i][k] + grafo[k][j];
+                }
+            }
+        }
+    }
+
+    cout << "Cierre transitivo usando el algoritmo de Warshall: " << endl;
+    imprimirMatriz(grafo, n);
+}
